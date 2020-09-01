@@ -1,0 +1,3 @@
+#!/bin/bash
+
+[[ -p ~/.zoom-docked/xdg-open-fifo ]] && echo "$1" > ~/.zoom-docked/xdg-open-fifo
