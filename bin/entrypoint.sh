@@ -27,4 +27,4 @@ echo "=== Executing $1 ==="
 
 # Execute zoom (or whatever)
 cd "$USER_HOME"
-exec sudo -H --preserve-env=DISPLAY -u "$USER_NAME" "$@"
+exec sudo -H --preserve-env=DISPLAY,XDG_OPEN_FIFO,DBUS_SESSION_BUS_ADDRESS -u "$USER_NAME" "$@"

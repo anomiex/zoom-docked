@@ -1,3 +1,5 @@
 #!/bin/bash
 
-[[ -p ~/.zoom-docked/xdg-open-fifo ]] && echo "$1" > ~/.zoom-docked/xdg-open-fifo
+# This is a stub to forward to a (hopefully) listening process on the host.
+
+[[ ! -z "$XDG_OPEN_FIFO" && -p "$XDG_OPEN_FIFO" ]] && echo "$1" > "$XDG_OPEN_FIFO"
