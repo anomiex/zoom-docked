@@ -64,6 +64,5 @@ docker run --name zoom --rm \
     --device /dev/snd \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v ~/.zoom-docked:"$USER_HOME/.zoom-docked" \
-    -v ~/.zoom-docked/zoomus.conf:"$USER_HOME/.config/zoomus.conf" \
     -v ~/.zoom-docked/.zoom:"$USER_HOME/.zoom" \
     anomiex/zoom-docked zoom "$@"
