@@ -38,6 +38,12 @@ itself may be used to install the wrapper script by invoking it as
 docker run -v /install/path:/target anomiex/zoom-docked install
 ```
 
+If you want links clicked in Zoom—including those for SSO—to work, the `xdg-open` command from
+[xdg-utils] must be installed on the host (and properly configured, if necessary).
+
+You may also want to install [xdg-dbus-proxy] to allow Zoom to inhibit screensavers and powersave
+shutdowns during meetings.
+
 The directory `~/.zoom-docked/` is mounted inside the container at the same location, and may be
 used for any necessary transfer of files to and from Zoom. Zoom's logs and such are located in
 `~/.zoom-docked/.zoom`.
@@ -53,3 +59,5 @@ The following projects were used as references when creating this:
 [Zoom]: http://www.zoom.us/
 [Docker]: https://www.docker.com/
 [PulseAudio]: https://www.freedesktop.org/wiki/Software/PulseAudio/
+[xdg-utils]: https://www.freedesktop.org/wiki/Software/xdg-utils/
+[xdg-dbus-proxy]: https://github.com/flatpak/xdg-dbus-proxy

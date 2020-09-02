@@ -8,22 +8,21 @@ ENV DEBIAN_FRONTEND noninteractive
 ARG ZOOM_URL=https://zoom.us/client/latest/zoom_amd64.deb
 
 RUN \
-# Dependencies for fetching, installing, and running zoom
   apt-get update && \
   apt-get -y install curl sudo \
     libxcb-keysyms1 libxcb-shape0 libxcb-randr0 libxcb-image0 libgl1-mesa-glx libegl1-mesa libpulse0 libxslt1.1 libxcb-xtest0 ibus && \
-# Install Zoom
+  \
   curl -L $ZOOM_URL -o /tmp/zoom_setup.deb && \
   dpkg -i /tmp/zoom_setup.deb && \
   rm /tmp/zoom_setup.deb && \
-# Cleanup
+  \
   apt-get --purge --auto-remove -y remove curl && \
   rm -rf /var/lib/apt/lists/*
 
 COPY zoom-docked /var/scripts/zoom-docked
-COPY bin/entrypoint.sh /sbin/entrypoint.sh
+COPY bin/docker-exec.sh bin/docker-run.sh /sbin/
 COPY bin/xdg-open /usr/bin/xdg-open
-RUN chmod 0755 /sbin/entrypoint.sh /usr/bin/xdg-open
+RUN chmod 0755 /sbin/docker-exec.sh /sbin/docker-run.sh /usr/bin/xdg-open
 
-ENTRYPOINT ["/sbin/entrypoint.sh"]
+ENTRYPOINT ["/sbin/docker-run.sh"]
 CMD ["help"]
