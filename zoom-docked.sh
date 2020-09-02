@@ -8,13 +8,16 @@ function killpids {
 }
 trap killpids SIGINT SIGHUP SIGTERM EXIT
 
-# Environment args for Docker
-declare -a ENV
+# Args for Docker
+declare -a ARGS
 function addenv {
-    ENV+=('--env' "$1"="$2")
+    ARGS+=('--env' "$1=$2")
 }
 
+# So Zoom can interact with X
 addenv DISPLAY "$DISPLAY"
+
+# entrypoint.sh uses these so the user IDs and such inside the container match those outside.
 addenv USER_NAME "$(id -un)"
 addenv USER_UID "$(id -u)"
 addenv USER_GID "$(id -g)"
@@ -25,7 +28,8 @@ addenv USER_HOME "$USER_HOME"
 mkdir -p ~/.zoom-docked/.zoom
 [[ -e ~/.zoom-docked/zoomus.conf ]] || touch ~/.zoom-docked/zoomus.conf
 
-# If available, export xdg-open calls to the host via a fifo
+# If available, export xdg-open calls to the host via a fifo so clicking links in Zoom chat opens
+# them in the host browser as expected.
 if command -v xdg-open >/dev/null; then
     XDG_OPEN_FIFO=~/.zoom-docked/xdg-open-fifo.$$
     mkfifo -m 0600 "$XDG_OPEN_FIFO"
@@ -53,15 +57,16 @@ if [[ ! -z "$DBUS_SESSION_BUS_ADDRESS" ]] && command -v xdg-dbus-proxy >/dev/nul
     addenv DBUS_SESSION_BUS_ADDRESS "unix:path=$DBUS_PROXY_FILE"
 fi
 
-# We need to pass this info into entrypoint.sh so the user IDs and such inside the container match
-# those outside.
+# Add video and audio devices
+for dev in /dev/video*; do
+    [[ -e "$dev" ]] && ARGS+=('--device' "$dev:$dev:rw")
+done
+ARGS+=('--device' "/dev/snd:/dev/snd:rw")
 
-# Also export DISPLAY
-
+# Run Zoom. Use a unique container name and remove the container when done to avoid multiple
+# instances running at once.
 docker run --name zoom --rm \
-    "${ENV[@]}" \
-    --device /dev/video0:/dev/video0 \
-    --device /dev/snd \
+    "${ARGS[@]}" \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v ~/.zoom-docked:"$USER_HOME/.zoom-docked" \
     -v ~/.zoom-docked/.zoom:"$USER_HOME/.zoom" \

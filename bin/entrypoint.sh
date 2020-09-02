@@ -26,7 +26,7 @@ adduser "$USER_NAME" audio
 
 echo "=== Executing $1 ==="
 
-# Copy zoomus.conf into position. Zoom tries to replace it by renaming, which doesn't work for a file bind mount.
+# Copy zoomus.conf into position. Zoom tries to update it by renaming, which doesn't work for a file bind mount.
 cp -a "$USER_HOME/.zoom-docked/zoomus.conf" "$USER_HOME/.config/zoomus.conf"
 
 # Execute zoom (or whatever)
