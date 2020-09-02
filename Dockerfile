@@ -20,9 +20,10 @@ RUN \
   apt-get --purge --auto-remove -y remove curl && \
   rm -rf /var/lib/apt/lists/*
 
+COPY zoom-docked /var/scripts/zoom-docked
 COPY bin/entrypoint.sh /sbin/entrypoint.sh
 COPY bin/xdg-open /usr/bin/xdg-open
 RUN chmod 0755 /sbin/entrypoint.sh /usr/bin/xdg-open
 
 ENTRYPOINT ["/sbin/entrypoint.sh"]
-CMD ["/usr/bin/zoom"]
+CMD ["help"]

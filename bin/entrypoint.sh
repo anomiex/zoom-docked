@@ -2,12 +2,40 @@
 
 set -e
 
+if [[ "$1" = "help" || -z "$1" ]]; then
+		cat <<-'EOF' >&2
+			Please use the `zoom-docked` wrapper script to run this container. It will set
+			the environment correctly and mount the correct volumes.
+
+			The wrapper script may be installed by passing `install` as the command to the
+			container, with the installation directory mounted at `/target`. For example,
+
+			  docker run -v /install/path:/target anomiex/zoom-docked install
+
+		EOF
+		exit 1
+fi
+
+if [[ "$1" = "install" ]]; then
+	if [[ -d "/target" ]]; then
+		install -m 0755 /var/scripts/zoom-docked /target/zoom-docked
+		echo '`zoom-docked` wrapper has been installed!'
+		exit 0
+	else
+		cat <<-'EOF' >&2
+			To install the wrapper, mount the target directory at `/target`. For example,
+
+			  docker run -v /install/path:/target anomiex/zoom-docked install
+
+		EOF
+		exit 1
+	fi
+fi
+
 USER_NAME=${USER_NAME:-zoom}
 USER_UID=${USER_UID:-1000}
 USER_GID=${USER_GID:-1000}
 USER_HOME=${USER_HOME:-"/home/$USER_NAME"}
-
-echo "=== Setting up user ==="
 
 # Docker will have created /home/$USER_NAME as root to mount
 # the volumes. Fix that. And create ~/.config too.
@@ -15,23 +43,28 @@ mkdir -p "$USER_HOME/.config/"
 chown "$USER_UID:$USER_GID" --from=0:0 -R "$USER_HOME"
 
 # Create the user and group.
-groupadd -f -g "$USER_GID" "$USER_NAME"
-adduser --disabled-login --uid "$USER_UID" --gid "$USER_GID" \
-    --no-create-home --home="$USER_HOME" \
-    --gecos 'Zoom' "$USER_NAME"
+addgroup --quiet --gid "$USER_GID" "$USER_NAME"
+adduser --quiet --disabled-login --uid "$USER_UID" --gid "$USER_GID" \
+	--no-create-home --home="$USER_HOME" \
+	--gecos 'Zoom' "$USER_NAME"
 
 # Add to video and audio groups, for access to video and audio devices.
-adduser "$USER_NAME" video
-adduser "$USER_NAME" audio
-
-echo "=== Executing $1 ==="
+# The weird stuff is to work around https://bugs.debian.org/558260, adduser always prints a message
+# to stderr when adding a user to a group but we only care on an actual error.
+TMP=$(adduser --quiet "$USER_NAME" video 2>&1) || { echo $TMP; exit 1; }
+TMP=$(adduser --quiet "$USER_NAME" audio 2>&1) || { echo $TMP; exit 1; }
 
 # Copy zoomus.conf into position. Zoom tries to update it by renaming, which doesn't work for a file bind mount.
-cp -a "$USER_HOME/.zoom-docked/zoomus.conf" "$USER_HOME/.config/zoomus.conf"
+[[ -e "$USER_HOME/.zoom-docked/zoomus.conf" ]] && cp -a "$USER_HOME/.zoom-docked/zoomus.conf" "$USER_HOME/.config/zoomus.conf"
+
+# Copy zoomus.conf back on exit
+function uncopyconf {
+	[[ -e "$USER_HOME/.config/zoomus.conf" ]] && cp -a "$USER_HOME/.config/zoomus.conf" "$USER_HOME/.zoom-docked/zoomus.conf"
+}
+trap uncopyconf SIGINT SIGHUP SIGTERM EXIT
 
 # Execute zoom (or whatever)
 cd "$USER_HOME"
 sudo -H --preserve-env=DISPLAY,XDG_OPEN_FIFO,DBUS_SESSION_BUS_ADDRESS -u "$USER_NAME" "$@"
 
-# Copy zoomus.conf back
-cp -a "$USER_HOME/.config/zoomus.conf" "$USER_HOME/.zoom-docked/zoomus.conf"
+# vim: ts=4 sw=4 noexpandtab

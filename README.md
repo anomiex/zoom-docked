@@ -32,7 +32,11 @@ docker build -t anomiex/zoom-docked .
 
 ## Usage ##
 
-The included wrapper script `zoom-docked.sh` should do the necessary work to execute Zoom.
+The included wrapper script `zoom-docked` should do the necessary work to execute Zoom. The image
+itself may be used to install the wrapper script by invoking it as
+```
+docker run -v /install/path:/target anomiex/zoom-docked install
+```
 
 The directory `~/.zoom-docked/` is mounted inside the container at the same location, and may be
 used for any necessary transfer of files to and from Zoom. Zoom's logs and such are located in
@@ -40,7 +44,7 @@ used for any necessary transfer of files to and from Zoom. Zoom's logs and such 
 
 ## Credit ##
 
-I used the following projects as references when creating this:
+The following projects were used as references when creating this:
 
 * https://github.com/DmitrySandalov/docker-zoom
 * https://github.com/mdouchement/docker-zoom-us
