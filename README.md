@@ -1,6 +1,6 @@
 # Docker image for Zoom #
 
-This is a `Dockerfile` to run [Zoom] for Linux inside a a [Docker] container.
+This is a `Dockerfile` to run [Zoom] for Linux inside a [Docker] container.
 
 ## Background ##
 

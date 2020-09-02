@@ -18,20 +18,39 @@ function addenv {
 addenv DISPLAY "$DISPLAY"
 
 # entrypoint.sh uses these so the user IDs and such inside the container match those outside.
-addenv USER_NAME "$(id -un)"
+USER_NAME="$(id -un)"
+USER_HOME="$HOME"
+addenv USER_NAME "$USER_NAME"
 addenv USER_UID "$(id -u)"
 addenv USER_GID "$(id -g)"
-USER_HOME="$HOME"
 addenv USER_HOME "$USER_HOME"
 
 # Create these so they get the right permissions inside the container.
 mkdir -p ~/.zoom-docked/.zoom
 [[ -e ~/.zoom-docked/zoomus.conf ]] || touch ~/.zoom-docked/zoomus.conf
 
+# These will be needed later
+CONTAINER="zoom-docked.$USER_NAME"
+XDG_OPEN_FIFO=~/.zoom-docked/xdg-open-fifo
+DBUS_PROXY_FILE=~/.zoom-docked/xdg-dbus-proxy
+
+# Detect if our container is already running. If so, exec a command on it instead of starting it
+# fresh.
+if docker container inspect -f '' "$CONTAINER" > /dev/null 2>&1; then
+	if [[ -e "$XDG_OPEN_FIFO" ]]; then
+		addenv XDG_OPEN_FIFO "$XDG_OPEN_FIFO"
+	fi
+	if [[ -e "$DBUS_PROXY_FILE" ]]; then
+		addenv DBUS_SESSION_BUS_ADDRESS "unix:path=$DBUS_PROXY_FILE"
+	fi
+	addenv RUNNING 1
+	docker exec "${ARGS[@]}" "$CONTAINER" /sbin/entrypoint.sh zoom "$@"
+	exit 0
+fi
+
 # If available, export xdg-open calls to the host via a fifo so clicking links in Zoom chat opens
 # them in the host browser as expected.
 if command -v xdg-open >/dev/null; then
-	XDG_OPEN_FIFO=~/.zoom-docked/xdg-open-fifo.$$
 	mkfifo -m 0600 "$XDG_OPEN_FIFO"
 	RM+=($XDG_OPEN_FIFO)
 
@@ -47,7 +66,6 @@ fi
 # If available, use xdg-dbus-proxy to proxy notification and screensaver-suppression DBus messages
 # to the host's session bus.
 if [[ ! -z "$DBUS_SESSION_BUS_ADDRESS" ]] && command -v xdg-dbus-proxy >/dev/null; then
-	DBUS_PROXY_FILE=~/.zoom-docked/xdg-dbus-proxy.$$
 	xdg-dbus-proxy "$DBUS_SESSION_BUS_ADDRESS" "$DBUS_PROXY_FILE" --filter \
 		--talk=org.freedesktop.Notifications \
 		--talk=org.freedesktop.ScreenSaver \
@@ -63,10 +81,8 @@ for dev in /dev/video*; do
 done
 ARGS+=('--device' "/dev/snd:/dev/snd:rw")
 
-# Run Zoom. Use a unique container name and remove the container when done to avoid multiple
-# instances running at once.
-docker run --name zoom --rm \
-	"${ARGS[@]}" \
+docker run --name "$CONTAINER" --rm \
+	"${ENVARGS[@]}" "${ARGS[@]}" \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	-v ~/.zoom-docked:"$USER_HOME/.zoom-docked" \
 	-v ~/.zoom-docked/.zoom:"$USER_HOME/.zoom" \
