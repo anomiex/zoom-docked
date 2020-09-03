@@ -12,15 +12,15 @@ workplace, and the web version doesn't support it, hence this docker file.
 
 This image currently makes a few assumptions:
 
-* That exporting `$DISPLAY` is all that's needed for Zoom to display out of the container.
+* That exporting `$DISPLAY` and `/tmp/.X11-unix` is all that's needed for Zoom to display out of the
+  container.
 * That the video devices are at `/dev/video*`, and membership in group `video` is sufficient to
   access them.
 * That the audio devices are at `/dev/snd`, and membership in group `audio` is sufficient to access
   them.
 
-This container does not interface with the host's [PulseAudio], if any! If you want Zoom to
-interface with PulseAudio, you might be better served by one of the projects mentioned in
-[Credit](#Credit) below.
+This container does not interface with the host's [PulseAudio], if any! Pull requests to add PA
+support would also be welcome as long as they don't break non-PA usage.
 
 ## Build ##
 
@@ -33,7 +33,7 @@ docker build -t anomiex/zoom-docked .
 ## Usage ##
 
 The included wrapper script `zoom-docked` should do the necessary work to execute Zoom. The image
-itself may be used to install the wrapper script by invoking it as
+itself may be used to install the wrapper script by invoking it as something like
 ```
 docker run -v /install/path:/target anomiex/zoom-docked install
 ```
