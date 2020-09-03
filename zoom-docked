@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# External configuration
+ZOOM_EXTRA_DOCKER_ARGS="${ZOOM_EXTRA_DOCKER_ARGS:-}"
+ZOOM_COMMAND="${ZOOM_COMMAND:-zoom}"
+
 # Allow for registering subprocesses to kill and files to remove on exit
 declare -a PIDS RM
 function killpids {
@@ -44,7 +48,7 @@ if docker container inspect -f '' "$CONTAINER" > /dev/null 2>&1; then
 		addenv DBUS_SESSION_BUS_ADDRESS "unix:path=$DBUS_PROXY_FILE"
 	fi
 	addenv RUNNING 1
-	docker exec "${ARGS[@]}" "$CONTAINER" /sbin/docker-exec.sh zoom "$@"
+	docker exec "${ARGS[@]}" $ZOOM_EXTRA_DOCKER_ARGS "$CONTAINER" /sbin/docker-exec.sh $ZOOM_COMMAND "$@"
 	exit 0
 fi
 
@@ -86,6 +90,7 @@ docker run --name "$CONTAINER" --rm \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	-v ~/.zoom-docked:"$USER_HOME/.zoom-docked" \
 	-v ~/.zoom-docked/.zoom:"$USER_HOME/.zoom" \
-	anomiex/zoom-docked zoom "$@"
+	$ZOOM_EXTRA_DOCKER_ARGS \
+	anomiex/zoom-docked $ZOOM_COMMAND "$@"
 
 # vim: ts=4 sw=4 noexpandtab
