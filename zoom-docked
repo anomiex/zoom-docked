@@ -73,6 +73,10 @@ if [[ ! -z "$DBUS_SESSION_BUS_ADDRESS" ]] && command -v xdg-dbus-proxy >/dev/nul
 	xdg-dbus-proxy "$DBUS_SESSION_BUS_ADDRESS" "$DBUS_PROXY_FILE" --filter \
 		--talk=org.freedesktop.Notifications \
 		--talk=org.freedesktop.ScreenSaver \
+		--talk=org.gnome.ScreenSaver \
+		--call=org.gnome.SessionManager.Inhibit=* \
+		--call=org.gnome.SessionManager.UnInhibit=* \
+		--call=org.gnome.SessionManager.IsInhibited=* \
 		--talk=org.freedesktop.PowerManagement.Inhibit &
 	PIDS+=($!)
 	RM+=($DBUS_PROXY_FILE)
