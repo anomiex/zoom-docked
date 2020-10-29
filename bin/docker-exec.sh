@@ -2,9 +2,7 @@
 
 set -e
 
-USER_NAME=${USER_NAME:-zoom}
-USER_UID=${USER_UID:-1000}
-USER_HOME=${USER_HOME:-"/home/$USER_NAME"}
+. /usr/share/zoom-docked/docker-shared.sh
 
 # The container was already running. So just do some sanity checks.
 EXISTING_USER_UID=$(id -u "$USER_NAME" 2>/dev/null)

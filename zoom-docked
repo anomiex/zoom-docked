@@ -40,14 +40,13 @@ DBUS_PROXY_FILE=~/.zoom-docked/xdg-dbus-proxy
 
 # Detect if our container is already running. If so, exec a command on it instead of starting it
 # fresh.
-if docker container inspect -f '' "$CONTAINER" > /dev/null 2>&1; then
+if docker container inspect -f '{}' "$CONTAINER" > /dev/null 2>&1; then
 	if [[ -e "$XDG_OPEN_FIFO" ]]; then
 		addenv XDG_OPEN_FIFO "$XDG_OPEN_FIFO"
 	fi
 	if [[ -e "$DBUS_PROXY_FILE" ]]; then
 		addenv DBUS_SESSION_BUS_ADDRESS "unix:path=$DBUS_PROXY_FILE"
 	fi
-	addenv RUNNING 1
 	docker exec "${ARGS[@]}" $ZOOM_EXTRA_DOCKER_ARGS "$CONTAINER" /sbin/docker-exec.sh $ZOOM_COMMAND "$@"
 	exit 0
 fi
@@ -90,7 +89,7 @@ done
 ARGS+=('--device' "/dev/snd:/dev/snd:rw")
 
 docker run --name "$CONTAINER" --rm \
-	"${ENVARGS[@]}" "${ARGS[@]}" \
+	"${ARGS[@]}" \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	-v ~/.zoom-docked:"$USER_HOME/.zoom-docked" \
 	-v ~/.zoom-docked/.zoom:"$USER_HOME/.zoom" \

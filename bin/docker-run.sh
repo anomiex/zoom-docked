@@ -2,40 +2,7 @@
 
 set -e
 
-if [[ "$1" = "help" || -z "$1" ]]; then
-		cat <<-'EOF' >&2
-			Please use the `zoom-docked` wrapper script to run this container. It will set
-			the environment correctly and mount the correct volumes.
-
-			The wrapper script may be installed by passing `install` as the command to the
-			container, with the installation directory mounted at `/target`. For example,
-
-			  docker run -v /install/path:/target anomiex/zoom-docked install
-
-		EOF
-		exit 1
-fi
-
-if [[ "$1" = "install" ]]; then
-	if [[ -d "/target" ]]; then
-		install -m 0755 /var/scripts/zoom-docked /target/zoom-docked
-		echo '`zoom-docked` wrapper has been installed!'
-		exit 0
-	else
-		cat <<-'EOF' >&2
-			To install the wrapper, mount the target directory at `/target`. For example,
-
-			  docker run -v /install/path:/target anomiex/zoom-docked install
-
-		EOF
-		exit 1
-	fi
-fi
-
-USER_NAME=${USER_NAME:-zoom}
-USER_UID=${USER_UID:-1000}
-USER_GID=${USER_GID:-1000}
-USER_HOME=${USER_HOME:-"/home/$USER_NAME"}
+. /usr/share/zoom-docked/docker-shared.sh
 
 # Docker will have created /home/$USER_NAME as root to mount
 # the volumes. Fix that. And create ~/.config too.

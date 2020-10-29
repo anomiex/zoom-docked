@@ -1,5 +1,16 @@
 #!/bin/bash
 
-# This is a stub to forward to a (hopefully) listening process on the host.
+# This is a stub to forward to a (hopefully) listening process on the host, or
+# else display a dialog offering to copy it to the clipboard.
 
-[[ ! -z "$XDG_OPEN_FIFO" && -p "$XDG_OPEN_FIFO" ]] && echo "$1" > "$XDG_OPEN_FIFO"
+URL="$*"
+
+if [[ ! -z "$XDG_OPEN_FIFO" && -p "$XDG_OPEN_FIFO" ]]; then
+	echo "$URL" > "$XDG_OPEN_FIFO"
+elif zenity --question \
+	--no-wrap \
+	--no-markup \
+	--text=$'Browser requested for:\n\n'"$URL"$'\n\nCopy URL to clipboard?'
+then
+	xclip -r -selection clipboard <<<"$URL"
+fi

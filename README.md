@@ -27,7 +27,7 @@ support would also be welcome as long as they don't break non-PA usage.
 After cloning the repo, execute
 
 ```
-docker build -t anomiex/zoom-docked .
+./build.sh
 ```
 
 ## Usage ##
@@ -35,7 +35,7 @@ docker build -t anomiex/zoom-docked .
 The included wrapper script `zoom-docked` should do the necessary work to execute Zoom. The image
 itself may be used to install the wrapper script by invoking it as something like
 ```
-docker run -v /install/path:/target anomiex/zoom-docked install
+docker run --rm -v /install/path:/target anomiex/zoom-docked install
 ```
 
 If you want links clicked in Zoom—including those for SSO—to work, the `xdg-open` command from
