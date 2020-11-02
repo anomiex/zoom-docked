@@ -17,13 +17,12 @@ RUN \
   apt-get --purge --auto-remove -y remove curl && \
   \
   printf "\e[7m== Installing Zoom and utilities ==\e[0m\n" && \
-  apt-get -y --no-install-recommends install sudo zenity xclip /tmp/zoom_setup.deb \
-      # Needed recommend
-      libqt5gui5 && \
+  apt-get -y install sudo zenity xclip /tmp/zoom_setup.deb && \
   dpkg --field /tmp/zoom_setup.deb Version > /etc/zoom-version && \
   \
   printf "\e[7m== Cleaning up ==\e[0m\n" && \
   rm -rf /tmp/zoom_setup.deb /var/lib/apt/lists/* && \
+  \
   printf "\e[7m== Finishing build ==\e[0m\n"
 
 COPY zoom-docked /var/scripts/zoom-docked

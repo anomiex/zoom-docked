@@ -7,9 +7,7 @@ URL="$*"
 
 if [[ ! -z "$XDG_OPEN_FIFO" && -p "$XDG_OPEN_FIFO" ]]; then
 	echo "$URL" > "$XDG_OPEN_FIFO"
-elif zenity --question \
-	--no-wrap \
-	--no-markup \
+elif zenity --question --no-wrap --no-markup \
 	--text=$'Browser requested for:\n\n'"$URL"$'\n\nCopy URL to clipboard?'
 then
 	xclip -r -selection clipboard <<<"$URL"
