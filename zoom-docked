@@ -88,6 +88,9 @@ for dev in /dev/video*; do
 done
 ARGS+=('--device' "/dev/snd:/dev/snd:rw")
 
+# Alsa's dmix plugin needs IPC too. Otherwise zoom will be blocked by any host audio app, and vice versa.
+ARGS+=('--ipc=host')
+
 docker run --name "$CONTAINER" --rm \
 	"${ARGS[@]}" \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
