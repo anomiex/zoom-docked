@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eo pipefail
+
 export USER_NAME=${USER_NAME:-zoom}
 export USER_UID=${USER_UID:-1000}
 export USER_GID=${USER_GID:-1000}

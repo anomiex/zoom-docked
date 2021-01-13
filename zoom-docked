@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -eo pipefail
 
 # External configuration
 ZOOM_EXTRA_DOCKER_ARGS="${ZOOM_EXTRA_DOCKER_ARGS:-}"
@@ -31,7 +33,7 @@ addenv USER_HOME "$USER_HOME"
 
 # Create these so they get the right permissions inside the container.
 mkdir -p ~/.zoom-docked/.zoom
-[[ -e ~/.zoom-docked/zoomus.conf ]] || touch ~/.zoom-docked/zoomus.conf
+[[ -e ~/.zoom-docked/zoomus.conf ]] || { touch ~/.zoom-docked/zoomus.conf && chmod 0600 ~/.zoom-docked/zoomus.conf; }
 
 # These will be needed later
 CONTAINER="zoom-docked.$USER_NAME"
@@ -68,7 +70,7 @@ fi
 
 # If available, use xdg-dbus-proxy to proxy notification and screensaver-suppression DBus messages
 # to the host's session bus.
-if [[ ! -z "$DBUS_SESSION_BUS_ADDRESS" ]] && command -v xdg-dbus-proxy >/dev/null; then
+if [[ -n "$DBUS_SESSION_BUS_ADDRESS" ]] && command -v xdg-dbus-proxy >/dev/null; then
 	xdg-dbus-proxy "$DBUS_SESSION_BUS_ADDRESS" "$DBUS_PROXY_FILE" --filter \
 		--talk=org.freedesktop.Notifications \
 		--talk=org.freedesktop.ScreenSaver \
