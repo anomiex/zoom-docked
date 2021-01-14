@@ -20,7 +20,6 @@ if [[ ! -d "$USER_HOME" ]]; then
 fi
 
 # Execute zoom (or whatever)
-cd "$USER_HOME"
-sudo -H --preserve-env=DISPLAY,XDG_OPEN_FIFO,DBUS_SESSION_BUS_ADDRESS -u "$USER_NAME" "$@"
+do_work "$@"
 
 # vim: ts=4 sw=4 noexpandtab

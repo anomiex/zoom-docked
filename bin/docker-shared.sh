@@ -42,4 +42,14 @@ if [[ "$1" = "version" ]]; then
 	exit 0
 fi
 
+function do_work() {
+	cd "$USER_HOME"
+	sudo -H --preserve-env=DISPLAY,TZ,XDG_OPEN_FIFO,DBUS_SESSION_BUS_ADDRESS -u "$USER_NAME" "$@"
+}
+
+# Execute a command, only printing output if it fails
+function quietly() {
+	TMP=$("$@" 2>&1) || { X=$?; echo "$TMP"; return $X; }
+}
+
 # vim: ts=4 sw=4 noexpandtab

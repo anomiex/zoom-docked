@@ -22,6 +22,8 @@ RUN \
   \
   printf "\e[7m== Cleaning up ==\e[0m\n" && \
   rm -rf /tmp/zoom_setup.deb /var/lib/apt/lists/* && \
+  # The symlink interferes with `-v /etc/localtime:/etc/localtime:ro` in the wrapper, so remove it.
+  rm -f /etc/localtime && \
   \
   printf "\e[7m== Finishing build ==\e[0m\n"
 

@@ -17,10 +17,8 @@ adduser --quiet --disabled-login --uid "$USER_UID" --gid "$USER_GID" \
 	--gecos 'Zoom' "$USER_NAME"
 
 # Add to video and audio groups, for access to video and audio devices.
-# The weird stuff is to work around https://bugs.debian.org/558260, adduser always prints a message
-# to stderr when adding a user to a group but we only care on an actual error.
-TMP=$(adduser --quiet "$USER_NAME" video 2>&1) || { echo "$TMP"; exit 1; }
-TMP=$(adduser --quiet "$USER_NAME" audio 2>&1) || { echo "$TMP"; exit 1; }
+quietly adduser --quiet "$USER_NAME" video
+quietly adduser --quiet "$USER_NAME" audio
 
 # Copy zoomus.conf into position. Zoom tries to update it by renaming, which doesn't work for a file bind mount.
 [[ -e "$USER_HOME/.zoom-docked/zoomus.conf" ]] && cp -a "$USER_HOME/.zoom-docked/zoomus.conf" "$USER_HOME/.config/zoomus.conf"
@@ -32,7 +30,6 @@ function uncopyconf {
 trap uncopyconf SIGINT SIGHUP SIGTERM EXIT
 
 # Execute zoom (or whatever)
-cd "$USER_HOME"
-sudo -H --preserve-env=DISPLAY,XDG_OPEN_FIFO,DBUS_SESSION_BUS_ADDRESS -u "$USER_NAME" "$@"
+do_work "$@"
 
 # vim: ts=4 sw=4 noexpandtab

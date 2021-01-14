@@ -31,6 +31,9 @@ addenv USER_UID "$(id -u)"
 addenv USER_GID "$(id -g)"
 addenv USER_HOME "$USER_HOME"
 
+# Pass through the host TZ variable, if any
+[[ -n "$TZ" ]] && addenv TZ "$TZ"
+
 # Create these so they get the right permissions inside the container.
 mkdir -p ~/.zoom-docked/.zoom
 [[ -e ~/.zoom-docked/zoomus.conf ]] || { touch ~/.zoom-docked/zoomus.conf && chmod 0600 ~/.zoom-docked/zoomus.conf; }
@@ -92,6 +95,10 @@ ARGS+=('--device' "/dev/snd:/dev/snd:rw")
 
 # Alsa's dmix plugin needs IPC too. Otherwise zoom will be blocked by any host audio app, and vice versa.
 ARGS+=('--ipc=host')
+
+# Pass through the host timezone settings
+[[ -e "/etc/timezone" ]] && ARGS+=('-v' '/etc/timezone:/etc/timezone:ro')
+[[ -e "/etc/localtime" ]] && ARGS+=('-v' '/etc/localtime:/etc/localtime:ro')
 
 docker run --name "$CONTAINER" --rm \
 	"${ARGS[@]}" \
