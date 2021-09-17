@@ -1,8 +1,7 @@
 FROM debian:buster-slim
 MAINTAINER Brad Jorsch <anomie@users.sourceforge.net>
 
-ENV DEBIAN_FRONTEND noninteractive
-
+ARG DEBIAN_FRONTEND=noninteractive
 ARG ZOOM_URL=https://zoom.us/client/latest/zoom_amd64.deb
 
 RUN \
