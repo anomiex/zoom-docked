@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 MAINTAINER Brad Jorsch <anomie@users.sourceforge.net>
 
 ARG DEBIAN_FRONTEND=noninteractive
