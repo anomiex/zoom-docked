@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 # External configuration
 ZOOM_EXTRA_DOCKER_ARGS="${ZOOM_EXTRA_DOCKER_ARGS:-}"
 ZOOM_COMMAND="${ZOOM_COMMAND:-zoom}"
@@ -99,6 +101,9 @@ ARGS+=('--ipc=host')
 # Pass through the host timezone settings
 [[ -e "/etc/timezone" ]] && ARGS+=('-v' '/etc/timezone:/etc/timezone:ro')
 [[ -e "/etc/localtime" ]] && ARGS+=('-v' '/etc/localtime:/etc/localtime:ro')
+
+# Updated seccomp profile: allow clone, setns, unshare.
+ARGS+=('--security-opt' "seccomp=$SCRIPT_DIR/seccomp.json")
 
 docker run --name "$CONTAINER" --rm \
 	"${ARGS[@]}" \
