@@ -44,7 +44,7 @@ fi
 
 function do_work() {
 	cd "$USER_HOME"
-	sudo -H --preserve-env=DISPLAY,TZ,XDG_OPEN_FIFO,DBUS_SESSION_BUS_ADDRESS -u "$USER_NAME" "$@"
+	sudo -H --preserve-env=DISPLAY,TZ,XDG_SESSION_TYPE,XDG_OPEN_FIFO,DBUS_SESSION_BUS_ADDRESS -u "$USER_NAME" "$@"
 }
 
 # Execute a command, only printing output if it fails

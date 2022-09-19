@@ -24,6 +24,7 @@ function addenv {
 
 # So Zoom can interact with X
 addenv DISPLAY "$DISPLAY"
+addenv XDG_SESSION_TYPE "$XDG_SESSION_TYPE"
 
 # docker-exec.sh and docker-run.sh use these so the user IDs and such inside the container match those outside.
 USER_NAME="$(id -un)"
@@ -83,6 +84,8 @@ if [[ -n "$DBUS_SESSION_BUS_ADDRESS" ]] && command -v xdg-dbus-proxy >/dev/null;
 		--call=org.gnome.SessionManager.Inhibit=* \
 		--call=org.gnome.SessionManager.UnInhibit=* \
 		--call=org.gnome.SessionManager.IsInhibited=* \
+		--call=org.freedesktop.portal.Desktop=* \
+		--call=org.freedesktop.portal.ScreenCast.CreateSession=* \
 		--talk=org.freedesktop.PowerManagement.Inhibit &
 	PIDS+=($!)
 	RM+=($DBUS_PROXY_FILE)
