@@ -16,7 +16,7 @@ RUN \
   apt-get --purge --auto-remove -y remove curl && \
   \
   printf "\e[7m== Installing Zoom and utilities ==\e[0m\n" && \
-  apt-get -y install sudo zenity xclip dbus-x11 /tmp/zoom_setup.deb && \
+  apt-get -y install sudo zenity xclip dbus-x11 libxcb-icccm4 libxcb-render-util0 /tmp/zoom_setup.deb && \
   dpkg --field /tmp/zoom_setup.deb Version > /etc/zoom-version && \
   \
   printf "\e[7m== Cleaning up ==\e[0m\n" && \
