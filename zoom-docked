@@ -39,7 +39,8 @@ addenv USER_HOME "$USER_HOME"
 
 # Create these so they get the right permissions inside the container.
 mkdir -p ~/.zoom-docked/.zoom
-[[ -e ~/.zoom-docked/zoomus.conf ]] || { touch ~/.zoom-docked/zoomus.conf && chmod 0600 ~/.zoom-docked/zoomus.conf; }
+mkdir -p ~/.zoom-docked/.config
+[[ -e ~/.zoom-docked/zoomus.conf && ! -e ~/.zoom-docked/.config/zoomus.conf ]] && mv ~/.zoom-docked/zoomus.conf ~/.zoom-docked/.config/
 
 # These will be needed later
 CONTAINER="zoom-docked.$USER_NAME"
@@ -113,6 +114,7 @@ docker run --name "$CONTAINER" --rm \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	-v ~/.zoom-docked:"$USER_HOME/.zoom-docked" \
 	-v ~/.zoom-docked/.zoom:"$USER_HOME/.zoom" \
+	-v ~/.zoom-docked/.config:"$USER_HOME/.config" \
 	$ZOOM_EXTRA_DOCKER_ARGS \
 	anomiex/zoom-docked $ZOOM_COMMAND "$@"
 

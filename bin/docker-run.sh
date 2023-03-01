@@ -20,15 +20,6 @@ adduser --quiet --disabled-login --uid "$USER_UID" --gid "$USER_GID" \
 quietly adduser --quiet "$USER_NAME" video
 quietly adduser --quiet "$USER_NAME" audio
 
-# Copy zoomus.conf into position. Zoom tries to update it by renaming, which doesn't work for a file bind mount.
-[[ -e "$USER_HOME/.zoom-docked/zoomus.conf" ]] && cp -a "$USER_HOME/.zoom-docked/zoomus.conf" "$USER_HOME/.config/zoomus.conf"
-
-# Copy zoomus.conf back on exit
-function uncopyconf {
-	[[ -e "$USER_HOME/.config/zoomus.conf" ]] && cp -a "$USER_HOME/.config/zoomus.conf" "$USER_HOME/.zoom-docked/zoomus.conf"
-}
-trap uncopyconf SIGINT SIGHUP SIGTERM EXIT
-
 # Execute zoom (or whatever)
 do_work "$@"
 
